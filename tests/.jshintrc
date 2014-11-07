@@ -5,6 +5,7 @@
   "expr": true,
   "globalstrict": true,
   "es3": true,
+  "newcap": false,
   "globals": {
     "window": false,
     "Buffer": false,
@@ -14,6 +15,13 @@
     "exports": false,
     "console": false,
     "document": false,
-    "setTimeout": false
+    "setTimeout": false,
+    /* MOCHA */
+    "describe"   : false,
+    "it"         : false,
+    "before"     : false,
+    "beforeEach" : false,
+    "after"      : false,
+    "afterEach"  : false
   }
 }

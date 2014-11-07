@@ -1,29 +1,26 @@
 {
   "name": "react-router-component",
-  "version": "0.20.3",
+  "version": "0.22.0",
   "description": "Declarative router component for React",
   "main": "index.js",
   "dependencies": {
     "envify": "^1.2.1",
-    "react": "^0.11.1",
+    "object.assign": "^1.0.1",
+    "react": "^0.12.0",
+    "react-async": "~2.0.0",
     "url-pattern": "~0.6.0",
     "urllite": "~0.4.0"
   },
-  "peerDependencies": {
-    "react": "~0.11.0",
-    "react-async": "~1.0.1"
-  },
   "devDependencies": {
-    "react": "~0.11.0",
-    "react-async": "~1.0.1",
-    "semver": "~2.2.1",
-    "mocha": "~1.17.1",
-    "jshint": "~2.4.3",
-    "zuul": "~1.5.2",
-    "browserify-shim": "^3.3.1",
-    "uglify-js": "^2.4.13",
     "browserify": "^3.32.1",
-    "reactify": "^0.14.0"
+    "browserify-shim": "^3.3.1",
+    "jsxhint": "~0.5.0",
+    "mocha": "~1.17.1",
+    "react-tools": "^0.12.0",
+    "reactify": "^0.15.1",
+    "semver": "~2.2.1",
+    "uglify-js": "^2.4.13",
+    "zuul": "~1.5.2"
   },
   "browserify": {
     "transform": [
@@ -35,7 +32,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/andreypopp/react-router-component"
+    "url": "git://github.com/strml/react-router-component"
   },
   "keywords": [
     "react",
@@ -49,11 +46,12 @@
     "Dave Mac (https://github.com/DveMac)",
     "Matthew Dapena-Tretter (https://github.com/matthewwithanm)",
     "Mitchel Kuijpers (https://github.com/mitchelkuijpers)",
-    "Simen Brekken <simen.brekken@gmail.com> (https://github.com/sbrekken)"
+    "Simen Brekken <simen.brekken@gmail.com> (https://github.com/sbrekken)",
+    "Samuel Reed <samuel.trace.reed@gmail.com> (https://github.com/strml)"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/andreypopp/react-router-component/issues"
+    "url": "https://github.com/strml/react-router-component/issues"
   },
-  "homepage": "http://andreypopp.viewdocs.io/react-router-component"
+  "homepage": "http://strml.viewdocs.io/react-router-component"
 }

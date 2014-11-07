@@ -1,10 +1,15 @@
+'use strict';
 var assert          = require('assert');
 var ReactAsync      = require('react-async');
 var React           = require('react');
 var ReactTestUtils  = require('react/lib/ReactTestUtils');
 var EventConstants  = require('react/lib/EventConstants');
 var Router          = require('../index');
-var CaptureClicks   = require('../lib/CaptureClicks');
+var CaptureClicks   = React.createFactory(require('../lib/CaptureClicks'));
+var Location        = React.createFactory(Router.Location);
+var Locations       = React.createFactory(Router.Locations);
+var NotFound        = React.createFactory(Router.NotFound);
+var Link            = React.createFactory(Router.Link);
 
 var historyAPI = (
     window.history !== undefined &&
@@ -58,7 +63,7 @@ function cleanUp(done) {
 function setUp(App) {
   return function() {
     host = document.createElement('div');
-    app = React.renderComponent(App(), host);
+    app = React.render(React.createElement(App), host);
     router = app.refs.router;
   }
 }
@@ -71,31 +76,32 @@ describe('Routing', function() {
 
     render: function() {
       return div({onClick: this.props.onClick},
-        Router.Locations({
+        Locations({
             ref: 'router', className: 'App',
             onNavigation: this.props.navigationHandler,
             onBeforeNavigation: this.props.beforeNavigationHandler
           },
-          Router.Location({
+          Location({
             path: '/__zuul',
             foo: 'bar',
             ref: 'link',
             handler: function(props) {
-              return Router.Link({
+              return Link({
                 foo: props.foo,
-                href: '/__zuul/hello',
+                ref: props.ref,
+                href: '/__zuul/hello'
               }, 'mainpage')
             }
           }),
-          Router.Location({
+          Location({
             path: '/__zuul/transient',
             handler: function(props) { return div(null, "i'm transient") }
           }),
-          Router.Location({
+          Location({
             path: '/__zuul/:slug',
             handler: function(props) { return div(null, props.slug) }
           }),
-          Router.NotFound({
+          NotFound({
             handler: function(props) { return div(null, 'not_found') }
           })
         ),
@@ -104,8 +110,8 @@ describe('Routing', function() {
           a({ref: 'anchorUnhandled', href: '/goodbye'}),
           a({ref: 'anchorExternal', href: 'https://github.com/andreypopp/react-router-component'})
         ),
-        Router.Link({ref: 'outside', href: '/__zuul/hi'}),
-        Router.Link({ref: 'prevented', href: '/__zuul/hi', onClick: this.handlePreventedLinkClick})
+        Link({ref: 'outside', href: '/__zuul/hi'}),
+        Link({ref: 'prevented', href: '/__zuul/hi', onClick: this.handlePreventedLinkClick})
       );
     },
 
@@ -153,7 +159,7 @@ describe('Routing', function() {
     assertRendered('mainpage');
     router.navigate('/__zuul/hello', function() {
       assertRendered('hello');
-      history.back();
+      window.history.back();
       delay(function() {
         assertRendered('mainpage');
         done();
@@ -167,7 +173,7 @@ describe('Routing', function() {
       assertRendered('hello');
       router.navigate('/__zuul/transient', {replace: true}, function() {
         assertRendered("i'm transient");
-        history.back();
+        window.history.back();
         delay(function() {
           assertRendered('mainpage');
           done();
@@ -296,10 +302,10 @@ describe('Routing with async components', function() {
   var App = React.createClass({
 
     render: function() {
-      return Router.Locations({ref: 'router', className: 'App'},
-        Router.Location({path: '/__zuul', handler: Main, ref: 'main'}),
-        Router.Location({path: '/__zuul/about', handler: About, ref: 'about'}),
-        Router.Location({path: '/__zuul/about2', handler: About, ref: 'about2'})
+      return Locations({ref: 'router', className: 'App'},
+        Location({path: '/__zuul', handler: Main, ref: 'main'}),
+        Location({path: '/__zuul/about', handler: About, ref: 'about'}),
+        Location({path: '/__zuul/about2', handler: About, ref: 'about2'})
       );
     }
   });
@@ -325,6 +331,7 @@ describe('Routing with async components', function() {
       return div(null, this.state.message ? this.state.message : 'loading...');
     }
   });
+  Main = React.createFactory(Main);
 
   var About = React.createClass({
     mixins: [ReactAsync.Mixin],
@@ -343,6 +350,7 @@ describe('Routing with async components', function() {
       return div(null, this.state.message ? this.state.message : 'loading...');
     }
   });
+  About = React.createFactory(About);
 
   beforeEach(function() {
     mainWasInLoadingState = false;
@@ -447,14 +455,14 @@ describe('Nested routers', function() {
   var NestedRouter = React.createClass({
     render: function() {
       return div(null,
-        Router.Locations(null,
-          Router.Location({
+        Locations(null,
+          Location({
             path: '/__zuul/nested/',
             handler: function(props) {
               return div(null, 'nested/root');
             }
           }),
-          Router.Location({
+          Location({
             path: '/__zuul/nested/page',
             handler: function(props) {
               return div(null, 'nested/page');
@@ -468,16 +476,16 @@ describe('Nested routers', function() {
 
     render: function() {
       return div(null,
-        Router.Locations({ref: 'router', className: 'App'},
-          Router.Location({
+        Locations({ref: 'router', className: 'App'},
+          Location({
             path: '/__zuul',
             foo: 'bar',
             ref: 'link',
             handler: function(props) {
-              return Router.Link({foo: props.foo, href: '/__zuul/hello'}, 'mainpage')
+              return Link({foo: props.foo, href: '/__zuul/hello'}, 'mainpage')
             }
           }),
-          Router.Location({
+          Location({
             path: '/__zuul/nested/*',
             handler: NestedRouter
           })
@@ -584,23 +592,23 @@ describe('Contextual routers', function() {
 
     render: function() {
       return div(null,
-        Router.Locations({ref: 'router', contextual: true},
-          Router.Location({
+        Locations({ref: 'router', contextual: true},
+          Location({
             path: '/',
             handler: function(props) { return div(null, 'subcat/root') }
           }),
-          Router.Location({
+          Location({
             path: '/page',
             ref: 'link',
             handler: function(props) {
-              return Router.Link({href: '/'}, 'subcat/page')
+              return Link({href: '/'}, 'subcat/page')
             }
           }),
-          Router.Location({
+          Location({
             path: '/escape',
             ref: 'link',
             handler: function(props) {
-              return Router.Link({global: true, href: '/__zuul'}, 'subcat/escape')
+              return Link({global: true, href: '/__zuul'}, 'subcat/escape')
             }
           }),
           Router.Location({
@@ -622,14 +630,14 @@ describe('Contextual routers', function() {
   var App = React.createClass({
 
     render: function() {
-      return Router.Locations({ref: 'router'},
-        Router.Location({
+      return Locations({ref: 'router'},
+        Location({
           path: '/__zuul',
           handler: function() {
             return div(null, "mainpage")
           }
         }),
-        Router.Location({
+        Location({
           path: '/__zuul/subcat/*',
           handler: SubCat,
           ref: 'subcat'
@@ -736,15 +744,15 @@ describe('Multiple active routers', function() {
   var App = React.createClass({
 
     render: function() {
-      var router1 = Router.Locations({ref: 'router1', className: 'App'},
-        Router.Location({
+      var router1 = Locations({ref: 'router1', className: 'App'},
+        Location({
           path: '/__zuul',
           ref: 'link',
           handler: function(props) {
-            return Router.Link({href: '/__zuul/hello'}, 'mainpage1')
+            return Link({href: '/__zuul/hello'}, 'mainpage1')
           }
         }),
-        Router.Location({
+        Location({
           path: '/__zuul/:slug',
           handler: function(props) {
             return div(null, props.slug + '1');
@@ -752,15 +760,15 @@ describe('Multiple active routers', function() {
         })
       );
 
-      var router2 = Router.Locations({ref: 'router2', className: 'App'},
-        Router.Location({
+      var router2 = Locations({ref: 'router2', className: 'App'},
+        Location({
           path: '/__zuul',
           ref: 'link',
           handler: function(props) {
-            return Router.Link({href: '/__zuul/hello'}, 'mainpage2')
+            return Link({href: '/__zuul/hello'}, 'mainpage2')
           }
         }),
-        Router.Location({
+        Location({
           path: '/__zuul/:slug',
           handler: function(props) {
             return div(null, props.slug + '2');
@@ -813,21 +821,21 @@ describe('Hash routing', function() {
   var App = React.createClass({
 
     render: function() {
-      return Router.Locations({ref: 'router', hash: true, className: 'App'},
-        Router.Location({
+      return Locations({ref: 'router', hash: true, className: 'App'},
+        Location({
           path: '/',
           ref: 'link',
           handler: function(props) {
-            return Router.Link({href: '/hello'}, 'mainpage');
+            return Link({href: '/hello'}, 'mainpage');
           }
         }),
-        Router.Location({
+        Location({
           path: '/transient',
           handler: function(props) {
             return div(null, "i'm transient");
           }
         }),
-        Router.Location({
+        Location({
           path: '/:slug',
           handler: function(props) {
             return div(null, props.slug);
@@ -854,7 +862,7 @@ describe('Hash routing', function() {
       delay(function() {
         router.navigate('/transient', {replace: true}, function() {
           assertRendered("i'm transient");
-          history.back();
+          window.history.back();
           delay(function() {
             assertRendered('mainpage');
             done();
@@ -939,16 +947,16 @@ describe('Contextual Hash routers', function() {
 
     render: function() {
       return div(null,
-        Router.Locations({ref: 'router', contextual: true},
-          Router.Location({
+        Locations({ref: 'router', contextual: true},
+          Location({
             path: '/',
             handler: function(props) { return div(null, 'subcat/root') }
           }),
-          Router.Location({
+          Location({
             path: '/escape',
             ref: 'link',
             handler: function(props) {
-              return Router.Link({globalHash: true, href: '/'}, 'subcat/escape');
+              return Link({globalHash: true, href: '/'}, 'subcat/escape');
             }
           }),
           Router.Location({
@@ -970,14 +978,14 @@ describe('Contextual Hash routers', function() {
   var App = React.createClass({
 
     render: function() {
-      return Router.Locations({ref: 'router', hash: true},
-        Router.Location({
+      return Locations({ref: 'router', hash: true},
+        Location({
           path: '/',
           handler: function() {
             return div(null, "mainpage");
           }
         }),
-        Router.Location({
+        Location({
           path: '/subcat/*',
           handler: SubCat,
           ref: 'subcat'
@@ -1041,5 +1049,5 @@ describe('Contextual Hash routers', function() {
   });
 
   });
-
 });
+

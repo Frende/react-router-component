@@ -9,13 +9,19 @@ component's `render()` method:
     <Locations>
       <Location path="/" handler={MainPage} />
       <Location path="/users/:username" handler={UserPage} />
+      <Location path="/search/*" handler={SearchPage} />
+      <Location path={/\/product\/([0-9]*)/} handler={ProductPage} />
     </Locations>
 
 Alternatively, if you don't prefer JSX:
 
+    var Locations = React.createFactory(Router.Locations);
+    var Location = React.createFactory(Router.Location);
     Locations(null,
       Location({path: "/", handler: MainPage}),
       Location({path: "/users/:username", handler: UserPage}))
+      Location({path: "/search/*", handler: SearchPage}))
+      Location({path: /\/product\/([0-9]*)/, handler: ProductPage}))
 
 Having routes defined as a part of your component hierarchy allows to
 dynamically reconfigure routing based on your application state. For example you
@@ -55,6 +61,11 @@ scope, cause JSX doesn't support namespaces yet:
     var Locations = Router.Locations
     var Location = Router.Location
 
+Otherwise, as of React 0.12, you must create factories:
+
+    var Locations = React.createFactory(Router.Locations)
+    var Location = React.createFactory(Router.Location)
+
 Now you can define your application as a regular React component which renders
 into `Locations` router:
 
@@ -70,6 +81,8 @@ into `Locations` router:
       }
     })
 
+**Note:** See [hash routing][hash-routing] to enable `location.hash`.
+ 
 Direct children of `Locations` router must be `Location` route descriptors.
 
 Each descriptor accepts a `path` property which specifies URL pattern and a
@@ -82,7 +95,7 @@ successful location match.
 
 The final part is to render your `App` component which activates your router:
 
-    React.renderComponent(App(), document.body)
+    React.renderComponent(React.createElement(App), document.body)
 
 In case no location is matched router would render into an empty set of
 elements.
@@ -178,4 +191,4 @@ These are the examples of what you can do with React Router component:
 [React]: http://facebook.github.io/react/
 [React-Refs]: http://facebook.github.io/react/docs/more-about-refs.html
 [React-Shims]: http://facebook.github.io/react/docs/working-with-the-browser.html#polyfills-needed-to-support-older-browsers
-[Saucelabs]: saucelabs.com
+[Saucelabs]: https://saucelabs.com

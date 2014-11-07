@@ -9,13 +9,17 @@ component's `render()` method:
     <Locations>
       <Location path="/" handler={MainPage} />
       <Location path="/users/:username" handler={UserPage} />
+      <Location path="/search/*" handler={SearchPage} />
+      <Location path={/\/product\/([0-9]*)/} handler={ProductPage} />
     </Locations>
 
 Alternatively, if you don't prefer JSX:
 
     Locations(null,
       Location({path: "/", handler: MainPage}),
-      Location({path: "/users/:username", handler: UserPage}))
+      Location({path: "/users/:username", handler: UserPage}),
+      Location({path: "/search/*", handler: SearchPage}),
+      Location({path: /\/product\/([0-9]*)/, handler: ProductPage}))
 
 Having routes defined as a part of your component hierarchy allows to
 dynamically reconfigure routing based on your application state. For example you
@@ -23,7 +27,7 @@ can return a different set of allowed locations for anonymous and signed-in
 users.
 
 React router component can dispatch based on `location.pathname` or
-`location.hash` if browser doesn't support History API.
+`location.hash` if browser doesn't support History API (see [hash routing][hash-routing]).
 
 Furthermore it provides advanced features like support for [full page server
 side rendering][server-side], [multiple routers][multiple] on the same page,
@@ -43,15 +47,15 @@ React router component is packaged on npm:
 
 See [docs][] for the usage.
 
-[hash-routing]: http://andreypopp.viewdocs.io/react-router-component/hash-routing
-[server-side]: http://andreypopp.viewdocs.io/react-router-component/server-side
-[multiple]: http://andreypopp.viewdocs.io/react-router-component/multiple
-[contextual]: http://andreypopp.viewdocs.io/react-router-component/contextual
-[url-pattern]: http://andreypopp.viewdocs.io/react-router-component/url-pattern
-[async]: http://andreypopp.viewdocs.io/react-router-component/async
+[hash-routing]: http://strml.viewdocs.io/react-router-component/hash-routing
+[server-side]: http://strml.viewdocs.io/react-router-component/server-side
+[multiple]: http://strml.viewdocs.io/react-router-component/multiple
+[contextual]: http://strml.viewdocs.io/react-router-component/contextual
+[url-pattern]: http://strml.viewdocs.io/react-router-component/url-pattern
+[async]: http://strml.viewdocs.io/react-router-component/async
 
-[docs]: http://andreypopp.viewdocs.io/react-router-component
+[docs]: http://strml.viewdocs.io/react-router-component
 [React]: http://facebook.github.io/react/
 [React-Refs]: http://facebook.github.io/react/docs/more-about-refs.html
 [React-Shims]: http://facebook.github.io/react/docs/working-with-the-browser.html#polyfills-needed-to-support-older-browsers
-[Saucelabs]: saucelabs.com
+[Saucelabs]: https://saucelabs.com
